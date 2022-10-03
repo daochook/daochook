@@ -1,0 +1,18 @@
+{
+    "Lua.diagnostics.disable": [
+        "lowercase-global",
+        "undefined-field"
+    ],
+    "Lua.diagnostics.globals": [
+        // Global Tables
+        "addon",
+        "daoc",
+        "game",
+        "gui",
+        "hook",
+        "bit",
+        "struct",
+    ],
+    "Lua.runtime.version": "LuaJIT",
+    "Lua.format.enable": false
+}
