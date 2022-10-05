@@ -20,7 +20,7 @@
 * along with daochook.  If not, see <https://www.gnu.org/licenses/>.
 --]]
 
-addon.name    = 'packetlog';
+addon.name    = 'packetlogger';
 addon.author  = 'atom0s';
 addon.desc    = 'Logs packets to a file on disk.';
 addon.link    = 'https://atom0s.com';
@@ -29,10 +29,14 @@ addon.version = '1.0';
 require 'common';
 require 'daoc';
 
+-- Prepare the logs output folder..
+local path = ('%s\\logs\\'):fmt(hook.get_hook_path());
+hook.fs.create_dir(path);
+
 -- Prepare the output file name based on the current date information..
 local time = hook.time.get_local_time();
-local file = ('%s\\packetlog_%02d.%02d.%02d.log'):fmt(addon.path, time['day'], time['month'], time['year']);
-daoc.chat.msg(daoc.chat.message_mode.help, ('[Packet Log] Saving packets to:\n%s'):fmt(file));
+local file = ('%s\\packetlog_%02d.%02d.%02d.log'):fmt(path, time['day'], time['month'], time['year']);
+daoc.chat.msg(daoc.chat.message_mode.help, ('[Packet Log] Packets will save to:\n%s'):fmt(file));
 
 --[[
 * Writes the given string to the current packet log file.
@@ -63,5 +67,14 @@ end);
 --]]
 hook.events.register('packet_send', 'packet_send_cb', function (e)
     log(('[C -> S] OpCode: %02X | Size: %d | Param: %08X\n'):fmt(e.opcode, e.size, e.parameter));
+    log(e.data:hexdump() .. '\n');
+end);
+
+--[[
+* event: packet_send
+* desc : Called when the game is sending a packet.
+--]]
+hook.events.register('packet_send_udp', 'packet_send_cb', function (e)
+    log(('[C -> S UDP] OpCode: %02X | Size: %d | Param: %08X\n'):fmt(e.opcode, e.size, e.parameter));
     log(e.data:hexdump() .. '\n');
 end);

@@ -6,7 +6,7 @@
 ------------------------------------------------------------------------------
 
 -- daochook: Adjust the cpath to look for the inner socket folder..
-package.cpath = package.cpath .. ';' .. ('%s/addons/libs/socket/?.dll;'):fmt(hook.get_install_path());
+package.cpath = package.cpath .. ';' .. ('%s/addons/libs/socket/?.dll;'):fmt(hook.get_hook_path());
 
 local core    = require("ssl.core")
 local context = require("ssl.context")
