@@ -115,7 +115,7 @@ ffi.cdef[[
         uint8_t     unknown14[4];
         uint32_t    unknown15;
         uint32_t    unknown16;
-        uint32_t    level;
+        uint32_t    level_;
         uint8_t     unknown17[276];
         uint8_t     unknown18;
         uint8_t     unknown19[9];
@@ -139,7 +139,7 @@ ffi.cdef[[
         uint8_t     unknown32[4];
         uint16_t    model_id_hair_color;
         uint8_t     unknown33[2];
-        uint32_t    health;
+        uint32_t    health_;
         uint8_t     unknown34[8];
         uint32_t    nameplate_index;
         uint8_t     unknown35[4];
@@ -154,7 +154,7 @@ ffi.cdef[[
         uint16_t    model_id_eye_color;
         uint8_t     unknown42[2];
         uint32_t    unknown43[4]; // Unknown, related to spell casting.
-        uint32_t    realm_id;
+        uint32_t    realm_id_;
         uint8_t     unknown44[16];
         float       unknown45;
         uint8_t     unknown46[2];
@@ -291,6 +291,57 @@ ffi.cdef[[
 ]];
 
 --[[
+* Entity Related Helper Metatype / Metatable Definitions
+--]]
+
+ffi.metatype('entity_t', T{
+    __index = function (self, k)
+        return switch(k, {
+            ['health'] = function () return bit.bxor(self.health_, 0xBE00) / 0x22 - 0x23; end,
+            ['level'] = function () return bit.bxor(self.level_, 0xCB96) / 0x4A - 0x17; end,
+            ['realm_id'] = function () return bit.bxor(self.realm_id_, 0x1C45) / 0x34 - 0x1D; end,
+            [switch.default] = function() return nil; end
+        });
+    end,
+    __newindex = function (self, k, v)
+        error('read-only type');
+    end
+});
+
+local entity_mt = T{
+    __index = function (self, k)
+        return switch(k, T{
+            ['entity'] = function () return self.entity; end,
+            ['index'] = function () return self.index; end,
+            ['name'] = function ()
+                if (self.is_local_player) then
+                    return daoc.game.decode_string(daoc.states.get_names_state().character_name_);
+                end
+                return daoc.entity.get_string(daoc.entity.strings.names, self.index);
+            end,
+            ['realm_id'] = function ()
+                if (self.is_local_player) then
+                    return daoc.entity.get_player_realm_id();
+                end
+                return self.entity[k];
+            end,
+            ['title'] = function () return daoc.entity.get_string(daoc.entity.strings.titles, self.index); end,
+
+            -- Decoded position helpers..
+            ['loc_x'] = function () return daoc.game.get_map_x_from_pos(self.entity.x, self.entity.y); end,
+            ['loc_y'] = function () return daoc.game.get_map_y_from_pos(self.entity.x, self.entity.y); end,
+            ['loc_heading'] = function () return 0x168 * (self.entity.heading + 0x800) / 0x1000 % 0x168; end,
+
+            -- Default to the original ffi entity object..
+            [switch.default] = function () return self.entity[k]; end,
+        });
+    end,
+    __newindex = function (self, k, v)
+        error('read-only type');
+    end
+};
+
+--[[
 * Entity Related Function Definitions
 --]]
 ffi.cdef[[
@@ -333,7 +384,14 @@ end
 daoc.entity.get = function (index)
     local ptr = hook.pointers.get('entity.func.get');
     if (ptr == 0) then return nil; end
-    return ffi.cast('get_entity_f', ptr)(index);
+
+    local o = T{
+        index = index,
+        is_local_player = index == daoc.entity.get_player_index(),
+        entity = ffi.cast('get_entity_f', ptr)(index),
+    };
+
+    return setmetatable(o, entity_mt);
 end
 
 --[[
@@ -350,6 +408,17 @@ daoc.entity.get_player_index = function ()
     local state = daoc.states.get_game_state();
     if (state == nil) then return 0; end
     return state.player_entity_index;
+end
+
+--[[
+* Returns the local players realm id.
+--]]
+daoc.entity.get_player_realm_id = function ()
+    local ptr = hook.pointers.get('game.ptr.player_realm_id');
+    if (ptr == 0) then return 0; end
+    ptr = hook.memory.read_uint32(ptr);
+    if (ptr == 0) then return 0; end
+    return hook.memory.read_uint32(ptr);
 end
 
 ----------------------------------------------------------------------------------------------------

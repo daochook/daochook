@@ -32,9 +32,16 @@ daoc.game = daoc.game or T{ };
 * Game Related Pointer Definitions
 --]]
 local pointers = T{
+    -- Packet Functions (Send)
     T{ n = 'game.func.packet_send_0x7D', m = 'game.dll', p = '558BEC83EC18833D????????020F??????????D905????????576A0633C0598D7DE8F3AB8B0D', o = 0, c = 0, },
     T{ n = 'game.func.packet_send_0xBB', m = 'game.dll', p = '558BEC83EC18833D????????020F??????????D905????????576A0633C0598D7DE8F3AB8B0D', o = 0, c = 1, },
     T{ n = 'game.func.packet_send_0x71', m = 'game.dll', p = '558BEC83EC18833D????????020F??????????D905????????576A0633C0598D7DE8F3AB8B0D', o = 0, c = 2, },
+
+    -- Map Information Functions
+    T{ n = 'game.func.get_map_index_from_pos',  m = 'game.dll', p = 'A1????????83F80474??83F80274??D94424045657E8', o = 0, c = 0, },
+    T{ n = 'game.func.get_map_x_from_pos',      m = 'game.dll', p = 'A1????????83F80474??83F80274??D94424045657E8', o = 0, c = 1, },
+    T{ n = 'game.func.get_map_y_from_pos',      m = 'game.dll', p = 'A1????????83F80474??83F80274??D94424045657E8', o = 0, c = 2, },
+    T{ n = 'game.func.get_map_name_from_pos',   m = 'game.dll', p = 'A1????????83F80474??83F80274??D94424045657E8', o = 0, c = 3, },
 };
 
 -- Ensure all pointers are valid..
@@ -53,9 +60,16 @@ end);
 ffi.cdef[[
     typedef const char* (__cdecl    *decode_string_f)(char* str);
 
+    // Packet Functions (Send)
     typedef void        (__cdecl    *packet_send_0x71_f)(const uint8_t a1, const uint8_t a2);
     typedef void        (__cdecl    *packet_send_0x7D_f)(const uint8_t a1, const uint8_t a2);
     typedef void        (__cdecl    *packet_send_0xBB_f)(const uint8_t a1, const uint8_t a2);
+
+    // Map Information Functions
+    typedef int32_t     (__cdecl    *get_map_index_from_pos_f)(const float x, const float y);
+    typedef int32_t     (__cdecl    *get_map_x_from_pos_f)(const float x, const float y);
+    typedef int32_t     (__cdecl    *get_map_y_from_pos_f)(const float x, const float y);
+    typedef const char* (__cdecl    *get_map_name_from_pos_f)(const float x, const float y);
 ]];
 
 --[[
@@ -113,4 +127,51 @@ end
 --]]
 daoc.game.send_packet = function (opcode, packet, parameter)
     game.send_packet(opcode, packet, parameter);
+end
+
+----------------------------------------------------------------------------------------------------
+--
+-- Map Related Functions
+--
+----------------------------------------------------------------------------------------------------
+
+--[[
+* Returns the map index for the given position.
+--]]
+daoc.game.get_map_index_from_pos_f = function (x, y)
+    local ptr = hook.pointers.get('game.func.get_map_index_from_pos');
+    if (ptr == 0) then return 0; end
+    return ffi.cast('get_map_x_from_pos_f', ptr)(x, y);
+end
+
+--[[
+* Returns the map x location for the given position.
+--]]
+daoc.game.get_map_x_from_pos = function (x, y)
+    local ptr = hook.pointers.get('game.func.get_map_x_from_pos');
+    if (ptr == 0) then return 0; end
+    return ffi.cast('get_map_x_from_pos_f', ptr)(x, y);
+end
+
+--[[
+* Returns the map y location for the given position.
+--]]
+daoc.game.get_map_y_from_pos = function (x, y)
+    local ptr = hook.pointers.get('game.func.get_map_y_from_pos');
+    if (ptr == 0) then return 0; end
+    return ffi.cast('get_map_y_from_pos_f', ptr)(x, y);
+end
+
+--[[
+* Returns the map name for the given position.
+--]]
+daoc.game.get_map_name_from_pos = function (x, y)
+    local ptr = hook.pointers.get('game.func.get_map_name_from_pos');
+    if (ptr == 0) then return 0; end
+
+    local name = ffi.cast('get_map_name_from_pos_f', ptr)(x, y);
+    if (name == nil) then
+        return nil;
+    end
+    return ffi.string(name);
 end
