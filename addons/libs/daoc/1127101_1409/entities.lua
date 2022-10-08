@@ -321,7 +321,7 @@ local entity_mt = T{
             end,
             ['realm_id'] = function ()
                 if (self.is_local_player) then
-                    return daoc.entity.get_player_realm_id();
+                    return daoc.player.get_realm_id();
                 end
                 return self.entity[k];
             end,
@@ -408,17 +408,6 @@ daoc.entity.get_player_index = function ()
     local state = daoc.states.get_game_state();
     if (state == nil) then return 0; end
     return state.player_entity_index;
-end
-
---[[
-* Returns the local players realm id.
---]]
-daoc.entity.get_player_realm_id = function ()
-    local ptr = hook.pointers.get('game.ptr.player_realm_id');
-    if (ptr == 0) then return 0; end
-    ptr = hook.memory.read_uint32(ptr);
-    if (ptr == 0) then return 0; end
-    return hook.memory.read_uint32(ptr);
 end
 
 ----------------------------------------------------------------------------------------------------

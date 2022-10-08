@@ -28,4 +28,5 @@ require 'daoc.1127101_1409.entities';
 require 'daoc.1127101_1409.game';
 require 'daoc.1127101_1409.items';
 require 'daoc.1127101_1409.party';
+require 'daoc.1127101_1409.player';
 require 'daoc.1127101_1409.states';
