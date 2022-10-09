@@ -99,7 +99,7 @@ ffi.cdef[[
         uint32_t    unknown05;
         uint8_t     unknown06;
         uint8_t     unknown07;
-        uint16_t    unknown08;
+        uint16_t    heading_previous;
         uint32_t    model_id_rhand;
         uint32_t    model_id_lhand;
         uint32_t    model_id_2hand;
@@ -107,21 +107,21 @@ ffi.cdef[[
         uint32_t    unknown09;
         uint16_t    unknown10;
         uint16_t    unknown11;
-        float       z_offset;
+        float       z_adjustment;
         float       x;
         uint16_t    state;
         uint16_t    unknown12;
         uint32_t    unknown13;
         uint8_t     unknown14[4];
-        uint32_t    unknown15;
+        uint32_t    z_offset_previous; // The entities previous z offset.
         uint32_t    unknown16;
         uint32_t    level_;
         uint8_t     unknown17[276];
-        uint8_t     unknown18;
+        uint8_t     model_flag;         // Flag field for this entities model. (Read from monsters.csv)
         uint8_t     unknown19[9];
         uint16_t    model_id_face;
         uint8_t     unknown20[16];
-        uint32_t    unknown21;
+        uint32_t    heading_turn_speed; // The current animation speed the entity is turning at.
         uint8_t     unknown22[4];
         uint32_t    model_id;
         uint8_t     unknown23[8];
@@ -148,7 +148,7 @@ ffi.cdef[[
         uint32_t    unknown37;
         uint16_t    initialized_flag;
         uint8_t     unknown38[6];
-        uint16_t    unknown39;          // Flag that sets the entity to 'stick' to the gronud when moving/jumping.
+        uint16_t    is_on_ground;       // Flag that states if the entity is currently on solid ground.
         uint8_t     unknown40[4];
         uint16_t    unknown41;          // Flag that stops the player from strafing and causes the camera to control differently.
         uint16_t    model_id_eye_color;
@@ -156,14 +156,14 @@ ffi.cdef[[
         uint32_t    unknown43[4]; // Unknown, related to spell casting.
         uint32_t    realm_id_;
         uint8_t     unknown44[16];
-        float       unknown45;
+        float       speed;              // Movement speed, clamped. (Only set for npcs that move real fast?)
         uint8_t     unknown46[2];
         uint16_t    animation_subid[4]; // Related to spell casting.
         uint16_t    object_type;
         uint8_t     unknown46_[4];
         uint16_t    model_id_hair_style;
         uint8_t     unknown47[202];
-        uint16_t    unknown48;          // If set to 1, prevents the entity from being targeted.
+        uint16_t    is_ambient_npc;     // If set to 1, prevents the entity from being targeted.
         uint16_t    unknown49;
         uint8_t     vampir_flag;
         uint8_t     unknown50[3];
@@ -172,19 +172,19 @@ ffi.cdef[[
         uint8_t     unknown53[2];
         float       y;
         uint8_t     unknown54[4];
-        float       unknown55;
-        uint8_t     underwater_flag;
+        float       x_previous;
+        uint8_t     is_under_water;     // Flag that is set when the entity is swimming underwater.
         uint8_t     unknown56[23];
         uint16_t    unknown57;          // Possibly guild id.
         uint8_t     unknown58;
         uint8_t     unknown59;
         uint8_t     unknown60[48];
         speffect_t  effects[20];        // The spell effects playing on the entity.
-        uint32_t    unknown61;
+        uint32_t    speed_previous;     // The entities previous speed.
         uint8_t     unknown62[4];
         uint16_t    unknown63;
         uint8_t     unknown64[2];
-        float       unknown65;
+        float       move_to_map_z;      // The entities current movement destination Z coord. (When pathing.)
         uint8_t     unknown66[30];
         uint16_t    heading;
         uint8_t     unknown67[4];
@@ -192,30 +192,32 @@ ffi.cdef[[
         uint8_t     unknown69[2];
         uint32_t    unknown70;
         uint8_t     unknown71[2];
-        uint16_t    unknown72;
+        uint16_t    speed_correction_adjustment; // Used when the entity is moving between their current and previous position too fast.
         uint16_t    unknown73;
         uint8_t     unknown74;
         uint8_t     unknown75;
-        uint16_t    unknown76;
+        uint16_t    zone_skin_id;
         uint8_t     unknown77[6];
-        uint16_t    unknown78;
+        uint16_t    is_off_ground;          // Flag that states if the entity is currently off the ground. (Set if swimming or flying.)
         uint16_t    unknown79;
         uint8_t     unknown80[14];
-        uint16_t    unknown81;
+        uint16_t    unknown81;              // Relates to animation speed and entity model.
         uint8_t     unknown82[12];
         uint16_t    is_dead_flag;
         uint16_t    unknown83;          // Used as a model reference index.
         uint8_t     unknown84[8];
-        uint16_t    unknown85;
+        uint16_t    unknown85;              // Unknown, related to the entity model. (model & 0x0F)
         uint8_t     unknown86[2];
-        uint16_t    unknown87;
+        uint16_t    unknown87;              // Used as a means to tell how often an entity should update when moving? (Default is 0x80)
         uint8_t     unknown88[6];
-        uint32_t    unknown88_[4]; // Unknown, related to spell casting.
-        uint8_t     unknown88__[8];
+        uint32_t    unknown88_1[4];         // Unknown, related to spell casting.
+        uint8_t     unknown88_2[4];
+        uint16_t    target_object_id;       // The entity target object id. (Only set for npcs.)
+        uint16_t    unknown88_3;
         uint32_t    animation_model_index; // Index of the animation model type being used for the entity.
         uint8_t     unknown89[18];
         uint16_t    unknown90;
-        uint32_t    unknown91;
+        uint32_t    heading_current;        // The entities current heading value while turning is animating.
         uint8_t     unknown92;
         uint8_t     unknown93[79];
         int16_t     unknown94;
@@ -252,7 +254,7 @@ ffi.cdef[[
         uint32_t    model_id_equip_lring;
         uint32_t    model_id_equip_rring;
         uint32_t    model_id_equip_mythical;
-        float       unknown106;
+        float       y_previous;
         uint8_t     unknown107[60];
         float       z;
         uint8_t     unknown108;
@@ -266,20 +268,20 @@ ffi.cdef[[
         uint32_t    model_id_nosewidth_ears_jaw_spines;
         uint32_t    model_id_mood1;
         uint32_t    model_id_mood2;
-        float       unknown113;
+        float       move_to_map_y;          // The entities current movement destination Y coord. (When pathing.)
         uint8_t     unknown114[12];
         uint32_t    unknown115;
         uint32_t    unknown116;
         uint8_t     unknown117[20];
         uint16_t    unknown118;
-        uint16_t    unknown119;
+        uint16_t    unknown119;             // Relates to animation speed and entity model. (Uses 'width' field from monsters.csv)
         uint8_t     unknown120;
         uint8_t     unknown121[3];
-        float       unknown122;
+        float       z_previous;
         uint8_t     unknown123[8];
-        float       unknown124;
-        float       unknown125;
-        uint32_t    unknown126;
+        float       move_to_map_x;          // The entities current movement destination X coord. (When pathing.)
+        float       z_offset;
+        uint32_t    unknown126;             // Part of the entity model information. (model >> 0x0D) & 0x07
         uint16_t    unknown127[4]; // Unknown, related to spell casting.
         uint16_t    unknown128;
         uint8_t     unknown129[6];
