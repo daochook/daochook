@@ -111,9 +111,6 @@ ImGuiInputTextFlags_NoUndoRedo                  = bit.lshift(1, 16);  -- Disable
 ImGuiInputTextFlags_CharsScientific             = bit.lshift(1, 17);  -- Allow 0123456789.+-*/eE (Scientific notation input)
 ImGuiInputTextFlags_CallbackResize              = bit.lshift(1, 18);  -- Callback on buffer capacity changes request (beyond 'buf_size' parameter value), allowing the string to grow. Notify when the string wants to be resized (for string types which hold a cache of their Size). You will be provided a new BufSize in the callback and NEED to honor it. (see misc/cpp/imgui_stdlib.h for an example of using this)
 ImGuiInputTextFlags_CallbackEdit                = bit.lshift(1, 19);  -- Callback on any edit (note that InputText() already returns true on edit, the callback is useful mainly to manipulate the underlying buffer while focus is active)
--- [Internal]
-ImGuiInputTextFlags_Multiline                   = bit.lshift(1, 20);  -- For internal use by InputTextMultiline()
-ImGuiInputTextFlags_NoMarkEdited                = bit.lshift(1, 21);  -- For internal use by functions using InputText() before reformatting data
 
 --[[
 * Gui Tree Node Flags
@@ -264,27 +261,29 @@ ImGuiTableFlags_SizingMask_                     = bit.bor(ImGuiTableFlags_Sizing
 
 -- Input configuration flags
 ImGuiTableColumnFlags_None                      = 0;
-ImGuiTableColumnFlags_DefaultHide               = bit.lshift(1, 0);  -- Default as a hidden/disabled column.
-ImGuiTableColumnFlags_DefaultSort               = bit.lshift(1, 1);  -- Default as a sorting column.
-ImGuiTableColumnFlags_WidthStretch              = bit.lshift(1, 2);  -- Column will stretch. Preferable with horizontal scrolling disabled (default if table sizing policy is _SizingStretchSame or _SizingStretchProp).
-ImGuiTableColumnFlags_WidthFixed                = bit.lshift(1, 3);  -- Column will not stretch. Preferable with horizontal scrolling enabled (default if table sizing policy is _SizingFixedFit and table is resizable).
-ImGuiTableColumnFlags_NoResize                  = bit.lshift(1, 4);  -- Disable manual resizing.
-ImGuiTableColumnFlags_NoReorder                 = bit.lshift(1, 5);  -- Disable manual reordering this column, this will also prevent other columns from crossing over this column.
-ImGuiTableColumnFlags_NoHide                    = bit.lshift(1, 6);  -- Disable ability to hide/disable this column.
-ImGuiTableColumnFlags_NoClip                    = bit.lshift(1, 7);  -- Disable clipping for this column (all NoClip columns will render in a same draw command).
-ImGuiTableColumnFlags_NoSort                    = bit.lshift(1, 8);  -- Disable ability to sort on this field (even if ImGuiTableFlags_Sortable is set on the table).
-ImGuiTableColumnFlags_NoSortAscending           = bit.lshift(1, 9);  -- Disable ability to sort in the ascending direction.
-ImGuiTableColumnFlags_NoSortDescending          = bit.lshift(1, 10); -- Disable ability to sort in the descending direction.
-ImGuiTableColumnFlags_NoHeaderWidth             = bit.lshift(1, 11); -- Disable header text width contribution to automatic column width.
-ImGuiTableColumnFlags_PreferSortAscending       = bit.lshift(1, 12); -- Make the initial sort direction Ascending when first sorting on this column (default).
-ImGuiTableColumnFlags_PreferSortDescending      = bit.lshift(1, 13); -- Make the initial sort direction Descending when first sorting on this column.
-ImGuiTableColumnFlags_IndentEnable              = bit.lshift(1, 14); -- Use current Indent value when entering cell (default for column 0).
-ImGuiTableColumnFlags_IndentDisable             = bit.lshift(1, 15); -- Ignore current Indent value when entering cell (default for columns > 0). Indentation changes _within_ the cell will still be honored.
+ImGuiTableColumnFlags_Disabled                  = bit.lshift(1, 0);  -- Overriding/master disable flag: hide column, won't show in context menu (unlike calling TableSetColumnEnabled() which manipulates the user accessible state)
+ImGuiTableColumnFlags_DefaultHide               = bit.lshift(1, 1);  -- Default as a hidden/disabled column.
+ImGuiTableColumnFlags_DefaultSort               = bit.lshift(1, 2);  -- Default as a sorting column.
+ImGuiTableColumnFlags_WidthStretch              = bit.lshift(1, 3);  -- Column will stretch. Preferable with horizontal scrolling disabled (default if table sizing policy is _SizingStretchSame or _SizingStretchProp).
+ImGuiTableColumnFlags_WidthFixed                = bit.lshift(1, 4);  -- Column will not stretch. Preferable with horizontal scrolling enabled (default if table sizing policy is _SizingFixedFit and table is resizable).
+ImGuiTableColumnFlags_NoResize                  = bit.lshift(1, 5);  -- Disable manual resizing.
+ImGuiTableColumnFlags_NoReorder                 = bit.lshift(1, 6);  -- Disable manual reordering this column, this will also prevent other columns from crossing over this column.
+ImGuiTableColumnFlags_NoHide                    = bit.lshift(1, 7);  -- Disable ability to hide/disable this column.
+ImGuiTableColumnFlags_NoClip                    = bit.lshift(1, 8);  -- Disable clipping for this column (all NoClip columns will render in a same draw command).
+ImGuiTableColumnFlags_NoSort                    = bit.lshift(1, 9);  -- Disable ability to sort on this field (even if ImGuiTableFlags_Sortable is set on the table).
+ImGuiTableColumnFlags_NoSortAscending           = bit.lshift(1, 10); -- Disable ability to sort in the ascending direction.
+ImGuiTableColumnFlags_NoSortDescending          = bit.lshift(1, 11); -- Disable ability to sort in the descending direction.
+ImGuiTableColumnFlags_NoHeaderLabel             = bit.lshift(1, 12); -- TableHeadersRow() will not submit label for this column. Convenient for some small columns. Name will still appear in context menu.
+ImGuiTableColumnFlags_NoHeaderWidth             = bit.lshift(1, 13); -- Disable header text width contribution to automatic column width.
+ImGuiTableColumnFlags_PreferSortAscending       = bit.lshift(1, 14); -- Make the initial sort direction Ascending when first sorting on this column (default).
+ImGuiTableColumnFlags_PreferSortDescending      = bit.lshift(1, 15); -- Make the initial sort direction Descending when first sorting on this column.
+ImGuiTableColumnFlags_IndentEnable              = bit.lshift(1, 16); -- Use current Indent value when entering cell (default for column 0).
+ImGuiTableColumnFlags_IndentDisable             = bit.lshift(1, 17); -- Ignore current Indent value when entering cell (default for columns > 0). Indentation changes _within_ the cell will still be honored.
 -- Output status flags, read-only via TableGetColumnFlags()
-ImGuiTableColumnFlags_IsEnabled                 = bit.lshift(1, 20); -- Status: is enabled == not hidden by user/api (referred to as "Hide" in _DefaultHide and _NoHide) flags.
-ImGuiTableColumnFlags_IsVisible                 = bit.lshift(1, 21); -- Status: is visible == is enabled AND not clipped by scrolling.
-ImGuiTableColumnFlags_IsSorted                  = bit.lshift(1, 22); -- Status: is currently part of the sort specs
-ImGuiTableColumnFlags_IsHovered                 = bit.lshift(1, 23); -- Status: is hovered by mouse
+ImGuiTableColumnFlags_IsEnabled                 = bit.lshift(1, 24); -- Status: is enabled == not hidden by user/api (referred to as "Hide" in _DefaultHide and _NoHide) flags.
+ImGuiTableColumnFlags_IsVisible                 = bit.lshift(1, 25); -- Status: is visible == is enabled AND not clipped by scrolling.
+ImGuiTableColumnFlags_IsSorted                  = bit.lshift(1, 26); -- Status: is currently part of the sort specs
+ImGuiTableColumnFlags_IsHovered                 = bit.lshift(1, 27); -- Status: is hovered by mouse
 -- [Internal] Combinations and masks
 ImGuiTableColumnFlags_WidthMask_                = bit.bor(ImGuiTableColumnFlags_WidthStretch, ImGuiTableColumnFlags_WidthFixed);
 ImGuiTableColumnFlags_IndentMask_               = bit.bor(ImGuiTableColumnFlags_IndentEnable, ImGuiTableColumnFlags_IndentDisable);
@@ -315,6 +314,8 @@ ImGuiFocusedFlags_None                          = 0;
 ImGuiFocusedFlags_ChildWindows                  = bit.lshift(1, 0); -- IsWindowFocused(): Return true if any children of the window is focused
 ImGuiFocusedFlags_RootWindow                    = bit.lshift(1, 1); -- IsWindowFocused(): Test from root window (top most parent of the current hierarchy)
 ImGuiFocusedFlags_AnyWindow                     = bit.lshift(1, 2); -- IsWindowFocused(): Return true if any window is focused. Important: If you are trying to tell how to dispatch your low-level inputs, do NOT use this. Use 'io.WantCaptureMouse' instead! Please read the FAQ!
+ImGuiFocusedFlags_NoPopupHierarchy              = bit.lshift(1, 3); -- Do not consider popup hierarchy (do not treat popup emitter as parent of popup) (when used with _ChildWindows or _RootWindow)
+ImGuiFocusedFlags_DockHierarchy                 = bit.lshift(1, 4); -- Consider docking hierarchy (treat dockspace host as parent of docked window) (when used with _ChildWindows or _RootWindow)
 ImGuiFocusedFlags_RootAndChildWindows           = bit.bor(ImGuiFocusedFlags_RootWindow, ImGuiFocusedFlags_ChildWindows);
 
 --[[
@@ -325,11 +326,14 @@ ImGuiHoveredFlags_None                          = 0;                -- Return tr
 ImGuiHoveredFlags_ChildWindows                  = bit.lshift(1, 0); -- IsWindowHovered() only: Return true if any children of the window is hovered
 ImGuiHoveredFlags_RootWindow                    = bit.lshift(1, 1); -- IsWindowHovered() only: Test from root window (top most parent of the current hierarchy)
 ImGuiHoveredFlags_AnyWindow                     = bit.lshift(1, 2); -- IsWindowHovered() only: Return true if any window is hovered
-ImGuiHoveredFlags_AllowWhenBlockedByPopup       = bit.lshift(1, 3); -- Return true even if a popup window is normally blocking access to this item/window
---ImGuiHoveredFlags_AllowWhenBlockedByModal     = bit.lshift(1, 4); -- Return true even if a modal popup window is normally blocking access to this item/window. FIXME-TODO: Unavailable yet.
-ImGuiHoveredFlags_AllowWhenBlockedByActiveItem  = bit.lshift(1, 5); -- Return true even if an active item is blocking access to this item/window. Useful for Drag and Drop patterns.
-ImGuiHoveredFlags_AllowWhenOverlapped           = bit.lshift(1, 6); -- Return true even if the position is obstructed or overlapped by another window
-ImGuiHoveredFlags_AllowWhenDisabled             = bit.lshift(1, 7); -- Return true even if the item is disabled
+ImGuiHoveredFlags_NoPopupHierarchy              = bit.lshift(1, 3); -- IsWindowHovered() only: Do not consider popup hierarchy (do not treat popup emitter as parent of popup) (when used with _ChildWindows or _RootWindow)
+--ImGuiHoveredFlags_DockHierarchy               = bit.lshift(1, 4); -- IsWindowHovered() only: Consider docking hierarchy (treat dockspace host as parent of docked window) (when used with _ChildWindows or _RootWindow)
+ImGuiHoveredFlags_AllowWhenBlockedByPopup       = bit.lshift(1, 5); -- Return true even if a popup window is normally blocking access to this item/window
+--ImGuiHoveredFlags_AllowWhenBlockedByModal     = bit.lshift(1, 6); -- Return true even if a modal popup window is normally blocking access to this item/window. FIXME-TODO: Unavailable yet.
+ImGuiHoveredFlags_AllowWhenBlockedByActiveItem  = bit.lshift(1, 7); -- Return true even if an active item is blocking access to this item/window. Useful for Drag and Drop patterns.
+ImGuiHoveredFlags_AllowWhenOverlapped           = bit.lshift(1, 8); -- IsItemHovered() only: Return true even if the position is obstructed or overlapped by another window
+ImGuiHoveredFlags_AllowWhenDisabled             = bit.lshift(1, 9); -- IsItemHovered() only: Return true even if the item is disabled
+ImGuiHoveredFlags_NoNavOverride                 = bit.lshift(1, 10);-- Disable using gamepad/keyboard navigation state when active, always query mouse.
 ImGuiHoveredFlags_RectOnly                      = bit.bor(ImGuiHoveredFlags_AllowWhenBlockedByPopup, ImGuiHoveredFlags_AllowWhenBlockedByActiveItem, ImGuiHoveredFlags_AllowWhenOverlapped);
 ImGuiHoveredFlags_RootAndChildWindows           = bit.bor(ImGuiHoveredFlags_RootWindow, ImGuiHoveredFlags_ChildWindows);
 
@@ -397,29 +401,144 @@ ImGuiSortDirection_Descending                   = 2; -- Descending = 9->0, Z->A 
 * Gui Keys
 --]]
 
-ImGuiKey_Tab                                    = 0;
-ImGuiKey_LeftArrow                              = 1;
-ImGuiKey_RightArrow                             = 2;
-ImGuiKey_UpArrow                                = 3;
-ImGuiKey_DownArrow                              = 4;
-ImGuiKey_PageUp                                 = 5;
-ImGuiKey_PageDown                               = 6;
-ImGuiKey_Home                                   = 7;
-ImGuiKey_End                                    = 8;
-ImGuiKey_Insert                                 = 9;
-ImGuiKey_Delete                                 = 10;
-ImGuiKey_Backspace                              = 11;
-ImGuiKey_Space                                  = 12;
-ImGuiKey_Enter                                  = 13;
-ImGuiKey_Escape                                 = 14;
-ImGuiKey_KeyPadEnter                            = 15;
-ImGuiKey_A                                      = 16; -- for text edit CTRL+A: select all
-ImGuiKey_C                                      = 17; -- for text edit CTRL+C: copy
-ImGuiKey_V                                      = 18; -- for text edit CTRL+V: paste
-ImGuiKey_X                                      = 19; -- for text edit CTRL+X: cut
-ImGuiKey_Y                                      = 20; -- for text edit CTRL+Y: redo
-ImGuiKey_Z                                      = 21; -- for text edit CTRL+Z: undo
-ImGuiKey_COUNT                                  = 22;
+ImGuiKey_None               = 0;
+ImGuiKey_Tab                = 512; -- ImGuiKey_NamedKey_BEGIN
+ImGuiKey_LeftArrow          = 513;
+ImGuiKey_RightArrow         = 514;
+ImGuiKey_UpArrow            = 515;
+ImGuiKey_DownArrow          = 516;
+ImGuiKey_PageUp             = 517;
+ImGuiKey_PageDown           = 518;
+ImGuiKey_Home               = 519;
+ImGuiKey_End                = 520;
+ImGuiKey_Insert             = 521;
+ImGuiKey_Delete             = 522;
+ImGuiKey_Backspace          = 523;
+ImGuiKey_Space              = 524;
+ImGuiKey_Enter              = 525;
+ImGuiKey_Escape             = 526;
+ImGuiKey_LeftCtrl           = 527;
+ImGuiKey_LeftShift          = 528;
+ImGuiKey_LeftAlt            = 529;
+ImGuiKey_LeftSuper          = 530;
+ImGuiKey_RightCtrl          = 531;
+ImGuiKey_RightShift         = 532;
+ImGuiKey_RightAlt           = 533;
+ImGuiKey_RightSuper         = 534;
+ImGuiKey_Menu               = 535;
+ImGuiKey_0                  = 536;
+ImGuiKey_1                  = 537;
+ImGuiKey_2                  = 538;
+ImGuiKey_3                  = 539;
+ImGuiKey_4                  = 540;
+ImGuiKey_5                  = 541;
+ImGuiKey_6                  = 542;
+ImGuiKey_7                  = 543;
+ImGuiKey_8                  = 544;
+ImGuiKey_9                  = 545;
+ImGuiKey_A                  = 546;
+ImGuiKey_B                  = 547;
+ImGuiKey_C                  = 548;
+ImGuiKey_D                  = 549;
+ImGuiKey_E                  = 550;
+ImGuiKey_F                  = 551;
+ImGuiKey_G                  = 552;
+ImGuiKey_H                  = 553;
+ImGuiKey_I                  = 554;
+ImGuiKey_J                  = 555;
+ImGuiKey_K                  = 556;
+ImGuiKey_L                  = 557;
+ImGuiKey_M                  = 558;
+ImGuiKey_N                  = 559;
+ImGuiKey_O                  = 560;
+ImGuiKey_P                  = 561;
+ImGuiKey_Q                  = 562;
+ImGuiKey_R                  = 563;
+ImGuiKey_S                  = 564;
+ImGuiKey_T                  = 565;
+ImGuiKey_U                  = 566;
+ImGuiKey_V                  = 567;
+ImGuiKey_W                  = 568;
+ImGuiKey_X                  = 569;
+ImGuiKey_Y                  = 570;
+ImGuiKey_Z                  = 571;
+ImGuiKey_F1                 = 572;
+ImGuiKey_F2                 = 573;
+ImGuiKey_F3                 = 574;
+ImGuiKey_F4                 = 575;
+ImGuiKey_F5                 = 576;
+ImGuiKey_F6                 = 577;
+ImGuiKey_F7                 = 578;
+ImGuiKey_F8                 = 579;
+ImGuiKey_F9                 = 580;
+ImGuiKey_F10                = 581;
+ImGuiKey_F11                = 582;
+ImGuiKey_F12                = 583;
+ImGuiKey_Apostrophe         = 584; -- '
+ImGuiKey_Comma              = 585; -- ,
+ImGuiKey_Minus              = 586; -- -
+ImGuiKey_Period             = 587; -- .
+ImGuiKey_Slash              = 588; -- /
+ImGuiKey_Semicolon          = 589; -- ;
+ImGuiKey_Equal              = 590; -- =
+ImGuiKey_LeftBracket        = 591; -- [
+ImGuiKey_Backslash          = 592; -- \ (this text inhibit multiline comment caused by backslash)
+ImGuiKey_RightBracket       = 593; -- ]
+ImGuiKey_GraveAccent        = 594; -- `
+ImGuiKey_CapsLock           = 595;
+ImGuiKey_ScrollLock         = 596;
+ImGuiKey_NumLock            = 597;
+ImGuiKey_PrintScreen        = 598;
+ImGuiKey_Pause              = 599;
+ImGuiKey_Keypad0            = 600;
+ImGuiKey_Keypad1            = 601;
+ImGuiKey_Keypad2            = 602;
+ImGuiKey_Keypad3            = 603;
+ImGuiKey_Keypad4            = 604;
+ImGuiKey_Keypad5            = 605;
+ImGuiKey_Keypad6            = 606;
+ImGuiKey_Keypad7            = 607;
+ImGuiKey_Keypad8            = 608;
+ImGuiKey_Keypad9            = 609;
+ImGuiKey_KeypadDecimal      = 610;
+ImGuiKey_KeypadDivide       = 611;
+ImGuiKey_KeypadMultiply     = 612;
+ImGuiKey_KeypadSubtract     = 613;
+ImGuiKey_KeypadAdd          = 614;
+ImGuiKey_KeypadEnter        = 615;
+ImGuiKey_KeypadEqual        = 616;
+
+ImGuiKey_GamepadStart       = 617; -- Menu (Xbox)          + (Switch)   Start/Options (PS) // --
+ImGuiKey_GamepadBack        = 618; -- View (Xbox)          - (Switch)   Share (PS)         // --
+ImGuiKey_GamepadFaceUp      = 619; -- Y (Xbox)             X (Switch)   Triangle (PS)      // -> ImGuiNavInput_Input
+ImGuiKey_GamepadFaceDown    = 620; -- A (Xbox)             B (Switch)   Cross (PS)         // -> ImGuiNavInput_Activate
+ImGuiKey_GamepadFaceLeft    = 621; -- X (Xbox)             Y (Switch)   Square (PS)        // -> ImGuiNavInput_Menu
+ImGuiKey_GamepadFaceRight   = 622; -- B (Xbox)             A (Switch)   Circle (PS)        // -> ImGuiNavInput_Cancel
+ImGuiKey_GamepadDpadUp      = 623; -- D-pad Up                                             // -> ImGuiNavInput_DpadUp
+ImGuiKey_GamepadDpadDown    = 624; -- D-pad Down                                           // -> ImGuiNavInput_DpadDown
+ImGuiKey_GamepadDpadLeft    = 625; -- D-pad Left                                           // -> ImGuiNavInput_DpadLeft
+ImGuiKey_GamepadDpadRight   = 626; -- D-pad Right                                          // -> ImGuiNavInput_DpadRight
+ImGuiKey_GamepadL1          = 627; -- L Bumper (Xbox)      L (Switch)   L1 (PS)            // -> ImGuiNavInput_FocusPrev + ImGuiNavInput_TweakSlow
+ImGuiKey_GamepadR1          = 628; -- R Bumper (Xbox)      R (Switch)   R1 (PS)            // -> ImGuiNavInput_FocusNext + ImGuiNavInput_TweakFast
+ImGuiKey_GamepadL2          = 629; -- L Trigger (Xbox)     ZL (Switch)  L2 (PS) [Analog]
+ImGuiKey_GamepadR2          = 630; -- R Trigger (Xbox)     ZR (Switch)  R2 (PS) [Analog]
+ImGuiKey_GamepadL3          = 631; -- L Thumbstick (Xbox)  L3 (Switch)  L3 (PS)
+ImGuiKey_GamepadR3          = 632; -- R Thumbstick (Xbox)  R3 (Switch)  R3 (PS)
+ImGuiKey_GamepadLStickUp    = 633; -- [Analog]                                             // -> ImGuiNavInput_LStickUp
+ImGuiKey_GamepadLStickDown  = 634; -- [Analog]                                             // -> ImGuiNavInput_LStickDown
+ImGuiKey_GamepadLStickLeft  = 635; -- [Analog]                                             // -> ImGuiNavInput_LStickLeft
+ImGuiKey_GamepadLStickRight = 636; -- [Analog]                                             // -> ImGuiNavInput_LStickRight
+ImGuiKey_GamepadRStickUp    = 637; -- [Analog]
+ImGuiKey_GamepadRStickDown  = 638; -- [Analog]
+ImGuiKey_GamepadRStickLeft  = 639; -- [Analog]
+ImGuiKey_GamepadRStickRight = 640; -- [Analog]
+
+ImGuiKey_ModCtrl            = 641;
+ImGuiKey_ModShift           = 642;
+ImGuiKey_ModAlt             = 643;
+ImGuiKey_ModSuper           = 644;
+
+ImGuiKey_COUNT              = 645;
 
 --[[
 * Gui Key Mod Flags
@@ -452,15 +571,6 @@ ImGuiNavInput_FocusPrev                         = 12;   -- next window (w/ PadMe
 ImGuiNavInput_FocusNext                         = 13;   -- prev window (w/ PadMenu)                     // e.g. R1 or R2 (PS4), RB or RT (Xbox), R or ZL (Switch)
 ImGuiNavInput_TweakSlow                         = 14;   -- slower tweaks                                // e.g. L1 or L2 (PS4), LB or LT (Xbox), L or ZL (Switch)
 ImGuiNavInput_TweakFast                         = 15;   -- faster tweaks                                // e.g. R1 or R2 (PS4), RB or RT (Xbox), R or ZL (Switch)
--- [Internal] Don't use directly! This is used internally to differentiate keyboard from gamepad inputs for behaviors that require to differentiate them.
--- Keyboard behavior that have no corresponding gamepad mapping (e.g. CTRL+TAB) will be directly reading from io.KeysDown[] instead of io.NavInputs[].
-ImGuiNavInput_KeyMenu_                          = 16;   -- toggle menu                                  // = io.KeyAlt
-ImGuiNavInput_KeyLeft_                          = 17;   -- move left                                    // = Arrow keys
-ImGuiNavInput_KeyRight_                         = 18;   -- move right
-ImGuiNavInput_KeyUp_                            = 19;   -- move up
-ImGuiNavInput_KeyDown_                          = 20;   -- move down
-ImGuiNavInput_COUNT                             = 21;
-ImGuiNavInput_InternalStart_                    = ImGuiNavInput_KeyMenu_;
 
 --[[
 * Gui Config Flags
@@ -551,30 +661,31 @@ ImGuiCol_COUNT                                  = 53;
 --]]
 
 ImGuiStyleVar_Alpha                             = 0;    -- float     Alpha
-ImGuiStyleVar_WindowPadding                     = 1;    -- ImVec2    WindowPadding
-ImGuiStyleVar_WindowRounding                    = 2;    -- float     WindowRounding
-ImGuiStyleVar_WindowBorderSize                  = 3;    -- float     WindowBorderSize
-ImGuiStyleVar_WindowMinSize                     = 4;    -- ImVec2    WindowMinSize
-ImGuiStyleVar_WindowTitleAlign                  = 5;    -- ImVec2    WindowTitleAlign
-ImGuiStyleVar_ChildRounding                     = 6;    -- float     ChildRounding
-ImGuiStyleVar_ChildBorderSize                   = 7;    -- float     ChildBorderSize
-ImGuiStyleVar_PopupRounding                     = 8;    -- float     PopupRounding
-ImGuiStyleVar_PopupBorderSize                   = 9;    -- float     PopupBorderSize
-ImGuiStyleVar_FramePadding                      = 10;   -- ImVec2    FramePadding
-ImGuiStyleVar_FrameRounding                     = 11;   -- float     FrameRounding
-ImGuiStyleVar_FrameBorderSize                   = 12;   -- float     FrameBorderSize
-ImGuiStyleVar_ItemSpacing                       = 13;   -- ImVec2    ItemSpacing
-ImGuiStyleVar_ItemInnerSpacing                  = 14;   -- ImVec2    ItemInnerSpacing
-ImGuiStyleVar_IndentSpacing                     = 15;   -- float     IndentSpacing
-ImGuiStyleVar_CellPadding                       = 16;   -- ImVec2    CellPadding
-ImGuiStyleVar_ScrollbarSize                     = 17;   -- float     ScrollbarSize
-ImGuiStyleVar_ScrollbarRounding                 = 18;   -- float     ScrollbarRounding
-ImGuiStyleVar_GrabMinSize                       = 19;   -- float     GrabMinSize
-ImGuiStyleVar_GrabRounding                      = 20;   -- float     GrabRounding
-ImGuiStyleVar_TabRounding                       = 21;   -- float     TabRounding
-ImGuiStyleVar_ButtonTextAlign                   = 22;   -- ImVec2    ButtonTextAlign
-ImGuiStyleVar_SelectableTextAlign               = 23;   -- ImVec2    SelectableTextAlign
-ImGuiStyleVar_COUNT                             = 24;
+ImGuiStyleVar_DisabledAlpha                     = 1;    -- float     DisabledAlpha
+ImGuiStyleVar_WindowPadding                     = 2;    -- ImVec2    WindowPadding
+ImGuiStyleVar_WindowRounding                    = 3;    -- float     WindowRounding
+ImGuiStyleVar_WindowBorderSize                  = 4;    -- float     WindowBorderSize
+ImGuiStyleVar_WindowMinSize                     = 5;    -- ImVec2    WindowMinSize
+ImGuiStyleVar_WindowTitleAlign                  = 6;    -- ImVec2    WindowTitleAlign
+ImGuiStyleVar_ChildRounding                     = 7;    -- float     ChildRounding
+ImGuiStyleVar_ChildBorderSize                   = 8;    -- float     ChildBorderSize
+ImGuiStyleVar_PopupRounding                     = 9;    -- float     PopupRounding
+ImGuiStyleVar_PopupBorderSize                   = 10;    -- float     PopupBorderSize
+ImGuiStyleVar_FramePadding                      = 11;   -- ImVec2    FramePadding
+ImGuiStyleVar_FrameRounding                     = 12;   -- float     FrameRounding
+ImGuiStyleVar_FrameBorderSize                   = 13;   -- float     FrameBorderSize
+ImGuiStyleVar_ItemSpacing                       = 14;   -- ImVec2    ItemSpacing
+ImGuiStyleVar_ItemInnerSpacing                  = 15;   -- ImVec2    ItemInnerSpacing
+ImGuiStyleVar_IndentSpacing                     = 16;   -- float     IndentSpacing
+ImGuiStyleVar_CellPadding                       = 17;   -- ImVec2    CellPadding
+ImGuiStyleVar_ScrollbarSize                     = 18;   -- float     ScrollbarSize
+ImGuiStyleVar_ScrollbarRounding                 = 19;   -- float     ScrollbarRounding
+ImGuiStyleVar_GrabMinSize                       = 20;   -- float     GrabMinSize
+ImGuiStyleVar_GrabRounding                      = 21;   -- float     GrabRounding
+ImGuiStyleVar_TabRounding                       = 22;   -- float     TabRounding
+ImGuiStyleVar_ButtonTextAlign                   = 23;   -- ImVec2    ButtonTextAlign
+ImGuiStyleVar_SelectableTextAlign               = 24;   -- ImVec2    SelectableTextAlign
+ImGuiStyleVar_COUNT                             = 25;
 
 --[[
 * Gui Button Flags
@@ -619,12 +730,7 @@ ImGuiColorEditFlags_InputRGB                    = bit.lshift(1, 27); -- [Input] 
 ImGuiColorEditFlags_InputHSV                    = bit.lshift(1, 28); -- [Input]      // ColorEdit, ColorPicker: input and output data in HSV format.
 -- Defaults Options. You can set application defaults using SetColorEditOptions(). The intent is that you probably don't want to
 -- override them in most of your calls. Let the user choose via the option menu and/or call SetColorEditOptions() once during startup.
-ImGuiColorEditFlags__OptionsDefault             = bit.bor(ImGuiColorEditFlags_Uint8, ImGuiColorEditFlags_DisplayRGB, ImGuiColorEditFlags_InputRGB, ImGuiColorEditFlags_PickerHueBar);
--- [Internal] Masks
-ImGuiColorEditFlags__DisplayMask                = bit.bor(ImGuiColorEditFlags_DisplayRGB, ImGuiColorEditFlags_DisplayHSV, ImGuiColorEditFlags_DisplayHex);
-ImGuiColorEditFlags__DataTypeMask               = bit.bor(ImGuiColorEditFlags_Uint8, ImGuiColorEditFlags_Float);
-ImGuiColorEditFlags__PickerMask                 = bit.bor(ImGuiColorEditFlags_PickerHueWheel, ImGuiColorEditFlags_PickerHueBar);
-ImGuiColorEditFlags__InputMask                  = bit.bor(ImGuiColorEditFlags_InputRGB, ImGuiColorEditFlags_InputHSV);
+ImGuiColorEditFlags_DefaultOptions_             = bit.bor(ImGuiColorEditFlags_Uint8, ImGuiColorEditFlags_DisplayRGB, ImGuiColorEditFlags_InputRGB, ImGuiColorEditFlags_PickerHueBar);
 
 --[[
 * Gui Slider Flags
@@ -717,19 +823,23 @@ IM_DRAWLIST_TEX_LINES_WIDTH_MAX                 = 63;
 ImDrawCallback_ResetRenderState                 = -1;
 
 --[[
-* Draw Corner Flags
+* Draw Flags
 --]]
 
-ImDrawCornerFlags_None                          = 0;
-ImDrawCornerFlags_TopLeft                       = bit.lshift(1, 0); -- 0x1
-ImDrawCornerFlags_TopRight                      = bit.lshift(1, 1); -- 0x2
-ImDrawCornerFlags_BotLeft                       = bit.lshift(1, 2); -- 0x4
-ImDrawCornerFlags_BotRight                      = bit.lshift(1, 3); -- 0x8
-ImDrawCornerFlags_Top                           = bit.bor(ImDrawCornerFlags_TopLeft, ImDrawCornerFlags_TopRight);   -- 0x3
-ImDrawCornerFlags_Bot                           = bit.bor(ImDrawCornerFlags_BotLeft, ImDrawCornerFlags_BotRight);   -- 0xC
-ImDrawCornerFlags_Left                          = bit.bor(ImDrawCornerFlags_TopLeft, ImDrawCornerFlags_BotLeft);    -- 0x5
-ImDrawCornerFlags_Right                         = bit.bor(ImDrawCornerFlags_TopRight, ImDrawCornerFlags_BotRight);  -- 0xA
-ImDrawCornerFlags_All                           = 0xF; -- In your function calls you may use ~0 (= all bits sets) instead of ImDrawCornerFlags_All, as a convenience
+ImDrawFlags_None                        = 0;
+ImDrawFlags_Closed                      = bit.lshift(1, 0); -- PathStroke(), AddPolyline(): specify that shape should be closed (Important: this is always == 1 for legacy reason)
+ImDrawFlags_RoundCornersTopLeft         = bit.lshift(1, 4); -- AddRect(), AddRectFilled(), PathRect(): enable rounding top-left corner only (when rounding > 0.0f, we default to all corners). Was 0x01.
+ImDrawFlags_RoundCornersTopRight        = bit.lshift(1, 5); -- AddRect(), AddRectFilled(), PathRect(): enable rounding top-right corner only (when rounding > 0.0f, we default to all corners). Was 0x02.
+ImDrawFlags_RoundCornersBottomLeft      = bit.lshift(1, 6); -- AddRect(), AddRectFilled(), PathRect(): enable rounding bottom-left corner only (when rounding > 0.0f, we default to all corners). Was 0x04.
+ImDrawFlags_RoundCornersBottomRight     = bit.lshift(1, 7); -- AddRect(), AddRectFilled(), PathRect(): enable rounding bottom-right corner only (when rounding > 0.0f, we default to all corners). Wax 0x08.
+ImDrawFlags_RoundCornersNone            = bit.lshift(1, 8); -- AddRect(), AddRectFilled(), PathRect(): disable rounding on all corners (when rounding > 0.0f). This is NOT zero, NOT an implicit flag!
+ImDrawFlags_RoundCornersTop             = bit.bor(ImDrawFlags_RoundCornersTopLeft, ImDrawFlags_RoundCornersTopRight);
+ImDrawFlags_RoundCornersBottom          = bit.bor(ImDrawFlags_RoundCornersBottomLeft, ImDrawFlags_RoundCornersBottomRight);
+ImDrawFlags_RoundCornersLeft            = bit.bor(ImDrawFlags_RoundCornersBottomLeft, ImDrawFlags_RoundCornersTopLeft);
+ImDrawFlags_RoundCornersRight           = bit.bor(ImDrawFlags_RoundCornersBottomRight, ImDrawFlags_RoundCornersTopRight);
+ImDrawFlags_RoundCornersAll             = bit.bor(ImDrawFlags_RoundCornersTopLeft, ImDrawFlags_RoundCornersTopRight, ImDrawFlags_RoundCornersBottomLeft, ImDrawFlags_RoundCornersBottomRight);
+ImDrawFlags_RoundCornersDefault_        = ImDrawFlags_RoundCornersAll; -- Default to ALL corners if none of the _RoundCornersXX flags are specified.
+ImDrawFlags_RoundCornersMask_           = bit.bor(ImDrawFlags_RoundCornersAll, ImDrawFlags_RoundCornersNone);
 
 --[[
 * Draw List Flags
@@ -749,6 +859,15 @@ ImFontAtlasFlags_None                           = 0;
 ImFontAtlasFlags_NoPowerOfTwoHeight             = bit.lshift(1, 0); -- Don't round the height to next power of two
 ImFontAtlasFlags_NoMouseCursors                 = bit.lshift(1, 1); -- Don't build software mouse cursors into the atlas (save a little texture memory)
 ImFontAtlasFlags_NoBakedLines                   = bit.lshift(1, 2); -- Don't build thick line textures into the atlas (save a little texture memory). The AntiAliasedLinesUseTex features uses them, otherwise they will be rendered using polygons (more expensive for CPU/GPU).
+
+--[[
+* Viewport Flags
+--]]
+
+ImGuiViewportFlags_None                         = 0;
+ImGuiViewportFlags_IsPlatformWindow             = bit.lshift(1, 0); -- Represent a Platform Window
+ImGuiViewportFlags_IsPlatformMonitor            = bit.lshift(1, 1); -- Represent a Platform Monitor (unused yet)
+ImGuiViewportFlags_OwnedByApp                   = bit.lshift(1, 2); -- Platform Window: is created/managed by the application (rather than a dear imgui backend)
 
 --[[
 *
