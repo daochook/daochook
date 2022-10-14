@@ -68,9 +68,9 @@ ffi.cdef[[
 ffi.metatype('partymember_t', T{
     __index = function (self, k)
         return switch(k, {
-            ['name'] = function () return ffi.string(self.name_); end,
-            ['class'] = function () return ffi.string(self.class_); end,
-            [switch.default] = function() return nil; end
+            ['name']            = function () return ffi.string(self.name_); end,
+            ['class']           = function () return ffi.string(self.class_); end,
+            [switch.default]    = function () return nil; end
         });
     end,
     __newindex = function (self, k, v)

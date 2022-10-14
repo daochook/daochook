@@ -153,7 +153,7 @@ ffi.cdef[[
         uint16_t    unknown41;          // Flag that stops the player from strafing and causes the camera to control differently.
         uint16_t    model_id_eye_color;
         uint8_t     unknown42[2];
-        uint32_t    unknown43[4]; // Unknown, related to spell casting.
+        uint32_t    unknown43[4];       // Unknown, related to spell casting.
         uint32_t    realm_id_;
         uint8_t     unknown44[16];
         float       speed;              // Movement speed, clamped. (Only set for npcs that move real fast?)
@@ -204,7 +204,7 @@ ffi.cdef[[
         uint16_t    unknown81;              // Relates to animation speed and entity model.
         uint8_t     unknown82[12];
         uint16_t    is_dead_flag;
-        uint16_t    unknown83;          // Used as a model reference index.
+        uint16_t    unknown83;              // Used as a model reference index.
         uint8_t     unknown84[8];
         uint16_t    unknown85;              // Unknown, related to the entity model. (model & 0x0F)
         uint8_t     unknown86[2];
@@ -214,7 +214,7 @@ ffi.cdef[[
         uint8_t     unknown88_2[4];
         uint16_t    target_object_id;       // The entity target object id. (Only set for npcs.)
         uint16_t    unknown88_3;
-        uint32_t    animation_model_index; // Index of the animation model type being used for the entity.
+        uint32_t    animation_model_index;  // Index of the animation model type being used for the entity.
         uint8_t     unknown89[18];
         uint16_t    unknown90;
         uint32_t    heading_current;        // The entities current heading value while turning is animating.
@@ -233,7 +233,7 @@ ffi.cdef[[
         uint32_t    unknown102;
         uint16_t    is_stealthed_flag;
         uint8_t     unknown103[26];
-        uint8_t     unknown103_[4]; // Unknown, related to spell casting.
+        uint8_t     unknown103_[4];         // Unknown, related to spell casting.
         uint32_t    attached_entity_index;
         uint16_t    unknown104;
         uint8_t     unknown105[2];
@@ -282,7 +282,7 @@ ffi.cdef[[
         float       move_to_map_x;          // The entities current movement destination X coord. (When pathing.)
         float       z_offset;
         uint32_t    unknown126;             // Part of the entity model information. (model >> 0x0D) & 0x07
-        uint16_t    unknown127[4]; // Unknown, related to spell casting.
+        uint16_t    unknown127[4];          // Unknown, related to spell casting.
         uint16_t    unknown128;
         uint8_t     unknown129[6];
         float       unknown130;
@@ -299,10 +299,10 @@ ffi.cdef[[
 ffi.metatype('entity_t', T{
     __index = function (self, k)
         return switch(k, {
-            ['health'] = function () return bit.bxor(self.health_, 0xBE00) / 0x22 - 0x23; end,
-            ['level'] = function () return bit.bxor(self.level_, 0xCB96) / 0x4A - 0x17; end,
-            ['realm_id'] = function () return bit.bxor(self.realm_id_, 0x1C45) / 0x34 - 0x1D; end,
-            [switch.default] = function() return nil; end
+            ['health']          = function () return bit.bxor(self.health_, 0xBE00) / 0x22 - 0x23; end,
+            ['level']           = function () return bit.bxor(self.level_, 0xCB96) / 0x4A - 0x17; end,
+            ['realm_id']        = function () return bit.bxor(self.realm_id_, 0x1C45) / 0x34 - 0x1D; end,
+            [switch.default]    = function () return nil; end
         });
     end,
     __newindex = function (self, k, v)
@@ -313,29 +313,19 @@ ffi.metatype('entity_t', T{
 local entity_mt = T{
     __index = function (self, k)
         return switch(k, T{
-            ['entity'] = function () return self.entity; end,
-            ['index'] = function () return self.index; end,
-            ['name'] = function ()
-                if (self.is_local_player) then
-                    return daoc.game.decode_string(daoc.states.get_names_state().character_name_);
-                end
-                return daoc.entity.get_string(daoc.entity.strings.names, self.index);
-            end,
-            ['realm_id'] = function ()
-                if (self.is_local_player) then
-                    return daoc.player.get_realm_id();
-                end
-                return self.entity[k];
-            end,
-            ['title'] = function () return daoc.entity.get_string(daoc.entity.strings.titles, self.index); end,
+            ['entity']          = function () return self.entity; end,
+            ['index']           = function () return self.index; end,
+            ['name']            = function () return self.is_local_player and daoc.states.get_names_state().character_name or daoc.entity.get_string(daoc.entity.strings.names, self.index); end,
+            ['realm_id']        = function () return self.is_local_player and daoc.player.get_realm_id() or self.entity[k]; end,
+            ['title']           = function () return daoc.entity.get_string(daoc.entity.strings.titles, self.index); end,
 
             -- Decoded position helpers..
-            ['loc_x'] = function () return daoc.game.get_map_x_from_pos(self.entity.x, self.entity.y); end,
-            ['loc_y'] = function () return daoc.game.get_map_y_from_pos(self.entity.x, self.entity.y); end,
-            ['loc_heading'] = function () return 0x168 * (self.entity.heading + 0x800) / 0x1000 % 0x168; end,
+            ['loc_x']           = function () return daoc.game.get_map_x_from_pos(self.entity.x, self.entity.y); end,
+            ['loc_y']           = function () return daoc.game.get_map_y_from_pos(self.entity.x, self.entity.y); end,
+            ['loc_heading']     = function () return 0x168 * (self.entity.heading + 0x800) / 0x1000 % 0x168; end,
 
             -- Default to the original ffi entity object..
-            [switch.default] = function () return self.entity[k]; end,
+            [switch.default]    = function () return self.entity[k]; end,
         });
     end,
     __newindex = function (self, k, v)

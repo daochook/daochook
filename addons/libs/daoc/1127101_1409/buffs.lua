@@ -89,8 +89,8 @@ ffi.cdef[[
 ffi.metatype('buff_t', T{
     __index = function (self, k)
         return switch(k, {
-            ['name'] = function () return ffi.string(self.name_); end,
-            [switch.default] = function() return nil; end
+            ['name']            = function () return ffi.string(self.name_); end,
+            [switch.default]    = function () return nil; end
         });
     end,
     __newindex = function (self, k, v)

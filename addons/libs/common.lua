@@ -20,7 +20,8 @@
 * along with daochook.  If not, see <https://www.gnu.org/licenses/>.
 --]]
 
-switch = require 'switch';
+switch  = require 'switch';
+try     = require 'trycatch';
 
 -- Extension Libraries
 local sugar = require 'sugar';

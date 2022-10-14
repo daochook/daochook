@@ -95,14 +95,14 @@ ffi.cdef[[
 ffi.metatype('playernamesstate_t', T{
     __index = function (self, k)
         return switch(k, {
-            ['character_name'] = function () return ffi.string(self.character_name_); end,
-            ['account_name'] = function () return ffi.string(self.account_name_); end,
-            ['zone_name'] = function () return ffi.string(self.zone_name_); end,
-            ['guild_name'] = function () return ffi.string(self.guild_name_); end,
-            ['prefix'] = function () return ffi.string(self.prefix_); end,
-            ['title'] = function () return ffi.string(self.title_); end,
-            ['last_name'] = function () return ffi.string(self.last_name_); end,
-            [switch.default] = function() return nil; end
+            ['character_name']  = function () return daoc.game.decode_string(self.character_name_); end,
+            ['account_name']    = function () return daoc.game.decode_string(self.account_name_); end,
+            ['zone_name']       = function () return daoc.game.decode_string(self.zone_name_); end,
+            ['guild_name']      = function () return ffi.string(self.guild_name_); end,
+            ['prefix']          = function () return ffi.string(self.prefix_); end,
+            ['title']           = function () return ffi.string(self.title_); end,
+            ['last_name']       = function () return ffi.string(self.last_name_); end,
+            [switch.default]    = function () return nil; end
         });
     end,
     __newindex = function (self, k, v)

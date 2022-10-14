@@ -442,10 +442,10 @@ ffi.cdef[[
 ffi.metatype('item_t', T{
     __index = function (self, k)
         return switch(k, {
-            ['name'] = function () return ffi.string(self.name_); end,
-            ['spell1_name'] = function () return ffi.string(self.spell1_name_); end,
-            ['spell2_name'] = function () return ffi.string(self.spell2_name_); end,
-            [switch.default] = function () return nil; end
+            ['name']            = function () return ffi.string(self.name_); end,
+            ['spell1_name']     = function () return ffi.string(self.spell1_name_); end,
+            ['spell2_name']     = function () return ffi.string(self.spell2_name_); end,
+            [switch.default]    = function () return nil; end
         });
     end,
     __newindex = function (self, k, v)
