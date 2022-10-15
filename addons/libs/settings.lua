@@ -435,6 +435,8 @@ end
 
 --[[
 * Returns the current settings path. (Specific to the given addons namespace.)
+*
+* @return {string} The settings path for this addon.
 --]]
 settingslib.settings_path = function ()
     local name = '_defaults_';

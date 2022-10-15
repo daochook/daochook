@@ -796,13 +796,13 @@ IM_COL32_A_SHIFT                                = 24;
 IM_COL32_A_MASK                                 = 0xFF000000;
 
 --[[
-* Convert the given ARGB values into a 32bit color.
+* Converts the given ARGB values into a 32bit color.
 *
-* @param {number} a - The alpha color code.
-* @param {number} r - The red color code.
-* @param {number} g - The green color code.
-* @param {number} b - The blue color code.
-* @return {number} The calculated ARGB value.
+* @param {number} a - The alpha color value.
+* @param {number} r - The red color value.
+* @param {number} g - The green color value.
+* @param {number} b - The blue color value.
+* @return {number} The converted 32bit color value.
 --]]
 function imgui.col32(a, r, g, b)
     return bit.bor(bit.lshift(a, IM_COL32_A_SHIFT), bit.lshift(b, IM_COL32_B_SHIFT), bit.lshift(g, IM_COL32_G_SHIFT), bit.lshift(r, IM_COL32_R_SHIFT));
@@ -879,10 +879,11 @@ ImGuiViewportFlags_OwnedByApp                   = bit.lshift(1, 2); -- Platform 
 * Draws an help marker with ImGui that will display some text when hovered over with the mouse.
 *
 * @param {string} text - The help string to display when hovered.
+* @param {boolean} same_line - (optional) Flag that states if the help tag should be displayed on the same line as the previous element.
 --]]
-function imgui.ShowHelp(text, sameLine)
-    sameLine = sameLine or true;
-    if (sameLine) then
+function imgui.ShowHelp(text, same_line)
+    same_line = same_line or true;
+    if (same_line) then
         imgui.SameLine();
     end
 
@@ -918,11 +919,11 @@ PopupResultNo     = 4;
 *
 * @param {string} title - The title text of the popup.
 * @param {string} name - The internal ImGui hashtag name of the popup.
-* @param {function} cb - The callback function to call to render the popups contents.
+* @param {function} callback - The callback function to call to render the popups contents.
 * @param {number} buttons - The type of buttons to show on the popup. (See PopupButtons above.)
 * @return {number} The popup result. (See PopupResult above.)
 --]]
-function imgui.DisplayPopup(title, name, cb, buttons)
+function imgui.DisplayPopup(title, name, callback, buttons)
     local res = PopupResultNone;
 
     -- Determine the window center for the popup..
@@ -936,7 +937,7 @@ function imgui.DisplayPopup(title, name, cb, buttons)
     -- Show the popup..
     if (imgui.BeginPopupModal(('%s###%s'):fmt(title, name), nil, ImGuiWindowFlags_AlwaysAutoResize)) then
         -- Render the inner-contents of the popup..
-        pcall(function () cb(); end);
+        pcall(function () callback(); end);
 
         -- Render the popup buttons..
         switch(buttons, {

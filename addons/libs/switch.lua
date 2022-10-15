@@ -57,6 +57,9 @@ return setmetatable({
 });
 
 --[[
+* This file is based on the following library:
+* https://github.com/ryanplusplus/switch.lua
+*
 * MIT License
 *
 * Copyright (c) 2017 Ryan Hartlage
