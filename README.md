@@ -19,9 +19,12 @@ daochook is released completely free of charge. You can say thanks by donating o
   * **Patreon Sponsor:** https://patreon.com/atom0s
   * **PayPal Donation:** https://www.paypal.me/atom0s
 
-## Features
+## Features & Documentation
 
 For the full list of features, including screenshots, please visit the documentation website.
+
+  - **Documentation Homepage:** https://daochook.github.io/
+  - **Features Page:** https://daochook.github.io/features/
 
 ## System Requirements
 
