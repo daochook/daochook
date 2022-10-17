@@ -4,7 +4,7 @@
 </div>
 
 <div align="center">
-    <a href="https://discord.gg/MtqPZJj5"><img src="https://img.shields.io/discord/1022736642257211393.svg?style=for-the-badge" alt="Discord server" /></a>
+    <a href="https://discord.gg/mkfP3XkZZ2"><img src="https://img.shields.io/discord/1022736642257211393.svg?style=for-the-badge" alt="Discord server" /></a>
     <a href="LICENSE.md"><img src="https://img.shields.io/badge/License-AGPL_v3-blue?style=for-the-badge" alt="license" /></a>
     <br/>
 </div>
