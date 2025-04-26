@@ -1,5 +1,5 @@
 --[[
-* daochook - Copyright (c) 2022 atom0s [atom0s@live.com]
+* daochook - Copyright (c) 2025 atom0s [atom0s@live.com]
 * Contact: https://www.atom0s.com/
 * Contact: https://discord.gg/UmXNvjq
 * Contact: https://github.com/atom0s

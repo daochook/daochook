@@ -1,5 +1,5 @@
 --[[
-* daochook - Copyright (c) 2022 atom0s [atom0s@live.com]
+* daochook - Copyright (c) 2025 atom0s [atom0s@live.com]
 * Contact: https://www.atom0s.com/
 * Contact: https://discord.gg/UmXNvjq
 * Contact: https://github.com/atom0s
@@ -29,7 +29,9 @@ daoc = daoc or T{ };
 * Supported DAoC Client Versions
 --]]
 local submodules = T{
+    T{ version = T{ 1, 11, 3, 0, 0, },      folder = '11130_0',      }, -- 1.1130 [1333]
     T{ version = T{ 1, 1, 27, 101, 1409, }, folder = '1127101_1409', }, -- 1.127e [1409]
+    T{ version = T{ 1, 1, 27, 101, 1411, }, folder = '1127101_1409', }, -- 1.127e [1411] (Same as 1409 currently.)
 };
 
 -- Obtain the current client version..
